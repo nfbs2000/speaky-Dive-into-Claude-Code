@@ -14,6 +14,34 @@
 않는다. 역공학 연구는 구현을 관찰할 수 있지만 Anthropic의 원래 의사결정 과정
 전체를 증명하지는 않는다.
 
+```mermaid
+flowchart LR
+    S["고정 source snapshot"] --> F["직접 확인한 사실"]
+    F --> I["연구자의 해석"]
+    I --> P["다른 시스템에 대한 제안"]
+    E["공식 SDK raw evidence"] --> X{"교차 검증"}
+    F --> X
+    X --> C["일치·차이·미관측을 구분"]
+```
+
+## 실제 source가 말할 수 있는 범위
+
+```typescript
+export type TranscriptMessage = SerializedMessage & {
+  parentUuid: UUID | null
+  isSidechain: boolean
+  agentId?: string
+  teamName?: string
+  promptId?: string
+}
+```
+
+[`TranscriptMessage`][actual-transcript]는 source snapshot에서 parent,
+sidechain, agent/team과 OTel prompt correlation이 저장된다는 사실을
+지지한다. 그러나 이것만으로 특정 팀이 실제 실행됐거나 공식 SDK가 같은 필드를
+보장한다고 말할 수는 없다. 실제 session evidence와 공식 문서를 별도로 확인해야
+한다.
+
 ## 함께 볼 자료
 
 - 원 논문과 PDF
@@ -35,3 +63,4 @@
 [repo]: https://github.com/VILA-Lab/Dive-into-Claude-Code
 [paper]: https://arxiv.org/abs/2604.14228
 [resources]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/related-resources.md
+[actual-transcript]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/logs.ts#L221-L231

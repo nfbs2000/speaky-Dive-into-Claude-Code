@@ -31,6 +31,34 @@ Claude Code는 서브에이전트의 전체 기록을 sidechain JSONL에 보존�
 이때 중요한 것은 조정자가 결과를 대신 만들어 주는 것이 아니다. 하위 실행의
 요청을 원문 의미를 잃지 않고 부모와 사용자에게 전달하는 것이다.
 
+```mermaid
+sequenceDiagram
+    participant P as Primary agent
+    participant A as AgentTool
+    participant C as Child context
+    P->>A: 독립 task 위임
+    A->>A: tool·MCP·permission 필터
+    A->>C: 새 context에서 실행
+    C-->>A: result + sidechain evidence
+    A-->>P: 요약된 결과
+```
+
+## 실제 source: spawn 전에 도구 가시성 계산
+
+```typescript
+const agentsWithMcpRequirementsMet =
+  filterAgentsByMcpRequirements(agents, mcpServersWithTools)
+const filteredAgents = filterDeniedAgents(
+  agentsWithMcpRequirementsMet,
+  toolPermissionContext,
+  AGENT_TOOL_NAME,
+)
+```
+
+[`AgentTool`][actual-agent]은 agent를 spawn하기 전에 MCP 요구사항과 현재
+permission rule을 적용한다. 자식에게 모든 도구를 넘긴 뒤 UI에서 숨기는 방식이
+아니다. 모델에게 보이는 capability 자체가 실행 경계와 일치해야 한다.
+
 ![서브에이전트 구조][subagent]
 
 ## 원문으로 돌아가기
@@ -41,3 +69,4 @@ Claude Code는 서브에이전트의 전체 기록을 sidechain JSONL에 보존�
 [readme]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
 [subagent]: https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/subagent.png
+[actual-agent]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/tools/AgentTool/AgentTool.tsx#L196-L230

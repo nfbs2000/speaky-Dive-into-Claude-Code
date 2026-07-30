@@ -44,8 +44,46 @@ hook, 필요할 때만 읽을 절차는 skill, 외부 행동은 MCP처럼 비용
 2. 질의 편의보다 원본 감사 가능성을 택한 append-only
 3. 결정론적 하니스 안에서 사용하는 모델 판단
 
+```mermaid
+flowchart TB
+    G["Goal"] --> Q["Query contract"]
+    Q --> C["Context budget"]
+    Q --> T["Tool capabilities"]
+    Q --> P["Permission policy"]
+    Q --> X["Stop·recovery limits"]
+    C --> V["관측 가능한 결과"]
+    T --> V
+    P --> V
+    X --> V
+```
+
+## 실제 source: loop에 들어가기 전의 계약
+
+```typescript
+export type QueryParams = {
+  messages: Message[]
+  systemPrompt: SystemPrompt
+  canUseTool: CanUseToolFn
+  toolUseContext: ToolUseContext
+  maxTurns?: number
+  taskBudget?: { total: number }
+}
+```
+
+실제 타입에는 user/system context, fallback model과 cache 설정도 있다.
+[`QueryParams`][actual-contract]는 model 선택 하나가 agent 설계가 아님을
+보여 준다. 목표를 실행 가능한 시스템으로 만들려면 context, capability,
+permission, turn과 budget 경계를 함께 명시해야 한다.
+
+## 설계 워크시트
+
+새 agent를 만들기 전에 위 그래프의 각 화살표에 대해 “누가 소유하는가”,
+“무슨 실제 event로 검증하는가”, “실패하면 무엇을 반환하는가”를 한 문장씩
+작성한다. 답이 없는 부분은 prompt로 덮지 말고 아직 구현되지 않은 경계로 남긴다.
+
 ## 원문으로 돌아가기
 
 - [Build Your Own AI Agent: 전문][builder]
 
 [builder]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md
+[actual-contract]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L181-L217

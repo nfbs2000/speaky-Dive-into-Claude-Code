@@ -34,6 +34,32 @@
 판단을 고정 상태 머신으로 과도하게 제한하지 않되, 행동 경계는 결정론적
 하니스가 책임진다.
 
+```mermaid
+flowchart LR
+    G["사용자 목표"] --> L["Agent loop"]
+    L --> M["Model 판단"]
+    M --> T["Tool 요청"]
+    T --> H["Permission·Hook·Sandbox"]
+    H --> X["실제 실행"]
+    X --> O["관측된 결과"]
+    O --> L
+```
+
+## 실제 source에서 확인하기
+
+```typescript
+const terminal = yield* queryLoop(params, consumedCommandUuids)
+for (const uuid of consumedCommandUuids) {
+  notifyCommandLifecycle(uuid, 'completed')
+}
+return terminal
+```
+
+[`query()` 실제 구현][actual-query]에서 모델 호출을 둘러싼 loop는
+`queryLoop()`에 모이지만, 정상 종료된 command lifecycle을 닫고 `Terminal`을
+반환하는 일은 결정론적 코드가 맡는다. “모델이 답했다”와 “실행이 정상
+완결됐다”는 다른 사실이다.
+
 ## 구축자에게 주는 질문
 
 에이전트를 만들 때 먼저 “어떤 모델을 쓸까”를 묻기 쉽다. 이 연구의 순서는
@@ -55,3 +81,4 @@
 
 [readme]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
+[actual-query]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L219-L238

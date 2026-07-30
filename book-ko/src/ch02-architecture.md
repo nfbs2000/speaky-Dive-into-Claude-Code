@@ -31,6 +31,15 @@
 행동을 소유하는가”를 구분해야 한다. UI는 루프를 보여 주지만 루프의 진실을
 소유하지 않는다. 권한 패널은 결정을 전달하지만 권한 규칙을 재구현하지 않는다.
 
+```mermaid
+flowchart TB
+    S["CLI · SDK · IDE · Desktop"] --> C["Core query loop"]
+    C --> A["Safety / Action"]
+    A --> B["Shell · Filesystem · MCP"]
+    C <--> ST["Session · Context · Memory"]
+    C --> S
+```
+
 ## 한 턴의 아홉 단계
 
 원 연구는 한 턴을 다음 순서로 정리한다.
@@ -40,6 +49,22 @@
 
 여기서 스트림은 단일 응답 상자가 아니다. 모델 텍스트, 도구 호출, 권한 대기,
 도구 결과와 다음 모델 호출이 하나의 시간축에서 이어진다.
+
+## 실제 source: stream과 terminal을 함께 갖는 경계
+
+```typescript
+export async function* query(
+  params: QueryParams,
+): AsyncGenerator<
+  StreamEvent | RequestStartEvent | Message,
+  Terminal
+>
+```
+
+실제 union에는 tombstone과 tool summary도 들어간다. [`query()`][actual-query]가
+이벤트를 순서대로 `yield`하면서 최종 종료 이유를 별도로 `return`한다는 점이
+계층의 핵심이다. 화면은 stream을 소비하지만 core의 terminal 의미를 새로 만들지
+않는다.
 
 ![한 턴의 실행 흐름][iteration]
 
@@ -51,3 +76,4 @@
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
 [readme]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [iteration]: https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/iteration.png
+[actual-query]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L219-L250

@@ -27,6 +27,33 @@ rule과 샌드박스가 맡는다.
 이 설계는 압축 성공을 “원래 대화가 사라졌다”는 뜻으로 만들지 않는다. 원본
 transcript는 append-only로 남고, 현재 모델이 보는 projection만 달라진다.
 
+```mermaid
+flowchart LR
+    R["append-only raw transcript"] --> B["budget reduction"]
+    B --> S["snip"]
+    S --> M["microcompact"]
+    M --> C["context collapse"]
+    C --> A["auto-compact summary"]
+    A --> P["현재 model projection"]
+```
+
+## 실제 source: 값싼 압축부터
+
+```typescript
+const snipResult = await deps.snip(messagesForQuery, querySource)
+messagesForQuery = snipResult.messages
+const microcompactResult = await deps.microcompact(
+  messagesForQuery,
+  querySource,
+)
+messagesForQuery = microcompactResult.messages
+```
+
+[`queryLoop()` 압축 구간][actual-compact]은 snip 뒤 microcompact를 적용하고,
+그 다음 context collapse와 autocompact를 검사한다. 다이어그램의 다섯 단계가
+동시에 실행되는 단일 “압축 상태”가 아니라, 조건과 비용이 다른 순차 projection인
+이유를 코드에서 확인할 수 있다.
+
 ## 파일 기반 메모리
 
 Claude Code 메모리는 벡터 데이터베이스가 아니라 사람이 열 수 있는 파일이다.
@@ -48,3 +75,4 @@ Claude Code 메모리는 벡터 데이터베이스가 아니라 사람이 열 �
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
 [builder]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md
 [context]: https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/context.png
+[actual-compact]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L396-L468

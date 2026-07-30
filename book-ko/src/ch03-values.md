@@ -36,6 +36,30 @@
 투명성을 높이지만 검색 능력은 제한한다. 그래서 별도의 LLM relevance scan이
 그 단순한 저장 방식을 보완한다. 한 설계 선택은 다른 선택의 비용을 만든다.
 
+```mermaid
+flowchart LR
+    V["가치"] --> P["설계 원칙"]
+    P --> C["코드 계약"]
+    C --> E["실행 evidence"]
+    E --> R{"가치를 지켰나?"}
+    R --> P
+```
+
+## 실제 source: 결정 이유의 provenance
+
+```typescript
+export type PermissionDecisionReason =
+  | { type: 'rule'; rule: PermissionRule }
+  | { type: 'mode'; mode: PermissionMode }
+  | { type: 'hook'; hookName: string; reason?: string }
+  | { type: 'classifier'; classifier: string }
+```
+
+실제 union에는 subcommand, prompt tool, async agent와 sandbox 이유도 있다.
+[`PermissionDecisionReason`][actual-reason]은 허용/거부만 남기지 않고 어떤
+경계가 결정했는지를 보존한다. 가치가 구현으로 내려왔는지는 결과 문자열보다
+이 provenance에서 더 정확하게 검증할 수 있다.
+
 ## 승인 피로가 가르치는 것
 
 승인 요청의 93%가 검토 없이 허용됐다면 경고를 더 많이 띄우는 것이 답이 아니다.
@@ -52,3 +76,4 @@
 
 [values]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [builder]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md
+[actual-reason]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/permissions.ts#L268-L310

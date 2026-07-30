@@ -26,6 +26,32 @@ MCP는 도구를 제공하지만 그것을 언제 쓸지는 모델과 현재 목
 순서로 모델에게 보일 도구가 결정된다. “코드에 도구가 존재한다”와 “현재 세션의
 모델이 그 도구를 볼 수 있다”는 다른 사실이다.
 
+```mermaid
+flowchart LR
+    H["Hooks\n0 context"] --> E["execute boundary"]
+    S["Skills\non-demand context"] --> A["assemble"]
+    P["Plugins\npackaging"] --> A
+    P --> M["model tool surface"]
+    MCP["MCP\nexternal tools"] --> M
+    M --> E
+```
+
+## 실제 source: self-describing tool contract
+
+```typescript
+type DefaultableToolKeys =
+  | 'isEnabled'
+  | 'isConcurrencySafe'
+  | 'isReadOnly'
+  | 'isDestructive'
+  | 'checkPermissions'
+  | 'userFacingName'
+```
+
+[`ToolDef`][actual-tool]은 각 tool이 실행 함수만이 아니라 활성화 조건, 동시성,
+파괴성, permission과 표시 이름을 함께 선언하게 한다. `buildTool()`은 빠진
+기본값을 채우지만, 실제 실행 결과나 위험도를 host가 임의로 재해석하지 않는다.
+
 ## SkillTool과 AgentTool
 
 SkillTool은 현재 컨텍스트에 지침을 넣는다. AgentTool은 별도 컨텍스트를 가진
@@ -42,3 +68,4 @@ SkillTool은 현재 컨텍스트에 지침을 넣는다. AgentTool은 별도 컨
 [readme]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
 [extensibility]: https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/extensibility.png
+[actual-tool]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/Tool.ts#L704-L726

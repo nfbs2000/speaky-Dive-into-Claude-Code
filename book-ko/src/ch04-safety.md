@@ -20,6 +20,34 @@ Claude Code의 안전 모델은 하나의 승인 창이 아니다. 요청은 적
 신뢰하는지 표현하는 스펙트럼이다. 내부 `bubble` 모드는 서브에이전트의 결정을
 상위 조정자에게 올린다.
 
+```mermaid
+flowchart LR
+    U["tool_use"] --> F["tool visibility filter"]
+    F --> H["PreToolUse hook"]
+    H --> R["deny-first rules"]
+    R --> M["permission mode"]
+    M --> Q{"allow · ask · deny"}
+    Q -->|allow| X["sandboxed execution"]
+    Q -->|ask| P["사용자 승인"]
+    Q -->|deny| D["원인과 함께 차단"]
+```
+
+## 실제 source: 질문은 실행이 아니다
+
+```typescript
+export type PermissionResult<Input> =
+  | PermissionDecision<Input>
+  | {
+      behavior: 'passthrough'
+      message: string
+      pendingClassifierCheck?: PendingClassifierCheck
+    }
+```
+
+[`PermissionResult`][actual-permission]의 `passthrough`는 상위 handler가 결정을
+이어받아야 한다는 뜻이다. 이를 allow로 바꾸거나, 승인 UI를 별도 새 세션으로
+투사하면 원래 permission protocol을 깨뜨린다.
+
 ## 공유 실패 모드
 
 방어층이 많다고 자동으로 안전해지지는 않는다. 여러 계층이 같은 토큰 비용,
@@ -43,3 +71,4 @@ Claude Code의 안전 모델은 하나의 승인 창이 아니다. 요청은 적
 [architecture]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md
 [readme]: https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md
 [permission]: https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/permission.png
+[actual-permission]: https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/permissions.ts#L241-L266
