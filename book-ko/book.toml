@@ -1,0 +1,14 @@
+[book]
+authors = ["VILA Lab 원저 · nfbs2000 한국어판"]
+language = "ko"
+src = "src"
+title = "Dive into Claude Code 한국어판"
+description = "Claude Code를 프로덕션 AI 에이전트의 설계 공간으로 읽는 연구 기반 한국어판"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/nfbs2000/speaky-Dive-into-Claude-Code"
