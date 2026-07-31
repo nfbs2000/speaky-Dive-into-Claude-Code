@@ -1,0 +1,860 @@
+<!DOCTYPE HTML>
+<html lang="ko" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Dive into Claude Code 한국어판</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Claude Code를 프로덕션 AI 에이전트의 설계 공간으로 읽는 연구 기반 한국어판">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="mermaid.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "ayu";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Dive into Claude Code 한국어판</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/nfbs2000/speaky-Dive-into-Claude-Code" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="한국어판을-읽는-법"><a class="header" href="#한국어판을-읽는-법">한국어판을 읽는 법</a></h1>
+<p>이 공개판은 <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code">VILA-Lab의 Dive into Claude Code</a>를 한국어로 읽기 위한
+동반판이다. 원본은 Claude Code의 기능을 나열하는 문서가 아니라, 대규모 실제
+에이전트 제품을 분석해 <strong>오늘과 다음 세대의 AI 에이전트를 어떻게 설계할지</strong>
+묻는 연구다.</p>
+<p>원본이 제시하는 가장 중요한 전환은 다음과 같다.</p>
+<blockquote>
+<p>에이전트의 차이는 모델이 얼마나 영리한지만으로 설명되지 않는다. 모델을 둘러싼
+권한, 컨텍스트, 도구, 복구, 세션과 인간 제어의 하니스가 제품의 실질적인
+능력을 결정한다.</p>
+</blockquote>
+<p>이 관점은 Claude Agent SDK의 이벤트를 관찰하는 강좌와 다르다. SDK 강좌가
+“실제로 무엇을 관찰할 수 있는가”를 묻는다면, 이 연구는 “관찰된 구조가 어떤
+가치와 설계 선택을 드러내는가”를 묻는다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/main_structure.png" alt="Claude Code의 상위 구조" /></p>
+<h2 id="원문과-함께-읽기"><a class="header" href="#원문과-함께-읽기">원문과 함께 읽기</a></h2>
+<p>각 장의 <code>원문으로 돌아가기</code> 링크는 한국어판이 읽은 고정 commit
+<code>ab04bc85e4920ceef2a8a47c069524d3bc9fec22</code>를 가리킨다. 최신 연구 내용은
+<a href="https://github.com/VILA-Lab/Dive-into-Claude-Code">upstream main</a>에서 확인한다.</p>
+<p>이 한국어판은 무료 참고 자료다. 원저자와 논문의 공로를 대체하지 않으며,
+연구를 자신의 최초 주장처럼 제시하지 않는다.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1장-984-하니스와-16-판단"><a class="header" href="#1장-984-하니스와-16-판단">1장: 98.4% 하니스와 1.6% 판단</a></h1>
+<p>원 연구의 출발점은 도발적이지만 단순하다.</p>
+<blockquote>
+<p>Claude Code 코드베이스에서 AI가 결정을 내리는 부분은 약 1.6%이고,
+나머지 98.4%는 결정론적 인프라다.</p>
+</blockquote>
+<p>이 수치는 “모델은 중요하지 않다”는 뜻이 아니다. 모델의 추론이 실제 제품으로
+작동하려면 그 추론을 행동으로 연결하고, 실패했을 때 복구하며, 위험한 행동을
+막고, 긴 작업을 이어 가는 시스템이 훨씬 큰 비중을 차지한다는 뜻이다.</p>
+<h2 id="단순한-루프-복잡한-주변부"><a class="header" href="#단순한-루프-복잡한-주변부">단순한 루프, 복잡한 주변부</a></h2>
+<p>에이전트 루프는 본질적으로 다음과 같은 반복이다.</p>
+<ol>
+<li>현재 대화와 환경을 조립한다.</li>
+<li>모델을 호출한다.</li>
+<li>모델이 요청한 도구를 분류한다.</li>
+<li>권한을 확인한 뒤 실행한다.</li>
+<li>결과를 대화에 추가한다.</li>
+<li>멈출 이유가 없으면 반복한다.</li>
+</ol>
+<p>루프만 복제하면 데모는 만들 수 있다. 그러나 프로덕션 제품에는 다음이 필요하다.</p>
+<ul>
+<li>권한 규칙의 우선순위와 사용자 승인</li>
+<li>도구별 동시성·격리·결과 크기 제한</li>
+<li>컨텍스트 압축과 캐시 안정성</li>
+<li>스트림 중단, 출력 한도와 모델 실패 복구</li>
+<li>세션 저장, 재개와 하위 에이전트 기록</li>
+<li>훅, 스킬, 플러그인과 MCP 확장</li>
+<li>CLI, SDK, IDE가 공유하는 실행 경로</li>
+</ul>
+<p>원 연구는 이것을 <strong>minimal scaffolding, maximal harness</strong>라고 읽는다. 모델의
+판단을 고정 상태 머신으로 과도하게 제한하지 않되, 행동 경계는 결정론적
+하니스가 책임진다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    G["사용자 목표"] --&gt; L["Agent loop"]
+    L --&gt; M["Model 판단"]
+    M --&gt; T["Tool 요청"]
+    T --&gt; H["Permission·Hook·Sandbox"]
+    H --&gt; X["실제 실행"]
+    X --&gt; O["관측된 결과"]
+    O --&gt; L
+</code></pre>
+<h2 id="실제-source에서-확인하기"><a class="header" href="#실제-source에서-확인하기">실제 source에서 확인하기</a></h2>
+<pre><code class="language-typescript">const terminal = yield* queryLoop(params, consumedCommandUuids)
+for (const uuid of consumedCommandUuids) {
+  notifyCommandLifecycle(uuid, 'completed')
+}
+return terminal
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L219-L238"><code>query()</code> 실제 구현</a>에서 모델 호출을 둘러싼 loop는
+<code>queryLoop()</code>에 모이지만, 정상 종료된 command lifecycle을 닫고 <code>Terminal</code>을
+반환하는 일은 결정론적 코드가 맡는다. “모델이 답했다”와 “실행이 정상
+완결됐다”는 다른 사실이다.</p>
+<h2 id="구축자에게-주는-질문"><a class="header" href="#구축자에게-주는-질문">구축자에게 주는 질문</a></h2>
+<p>에이전트를 만들 때 먼저 “어떤 모델을 쓸까”를 묻기 쉽다. 이 연구의 순서는
+다르다.</p>
+<ul>
+<li>실패한 도구 결과가 모델에게 그대로 돌아가는가?</li>
+<li>사용자가 거절한 권한을 같은 호출로 다시 압박하지 않는가?</li>
+<li>컨텍스트가 가득 찼을 때 무엇부터 줄이는가?</li>
+<li>세션을 재개할 때 신뢰와 권한도 복원되는가?</li>
+<li>서브에이전트의 장황한 기록이 부모 컨텍스트를 오염시키는가?</li>
+<li>사용자는 시스템이 기억하는 내용을 직접 열어 볼 수 있는가?</li>
+</ul>
+<p>이 질문에 답하지 못하면 좋은 모델을 연결해도 신뢰할 수 있는 제품이 되지 않는다.</p>
+<h2 id="원문으로-돌아가기"><a class="header" href="#원문으로-돌아가기">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Key Highlights와 Agentic Query Loop</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Four Design Questions</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="2장-다섯-계층과-하나의-에이전트-루프"><a class="header" href="#2장-다섯-계층과-하나의-에이전트-루프">2장: 다섯 계층과 하나의 에이전트 루프</a></h1>
+<p>원 연구는 Claude Code를 7개 구성요소와 5개 계층으로 분해한다. 이 분해는 파일
+디렉터리의 복사본이 아니다. 사용자 입력이 행동과 결과로 바뀌는 책임의 경계다.</p>
+<h2 id="일곱-구성요소"><a class="header" href="#일곱-구성요소">일곱 구성요소</a></h2>
+<ol>
+<li><strong>사용자</strong>: 목표를 말하고 권한을 승인하며 결과를 검토한다.</li>
+<li><strong>인터페이스</strong>: 대화형 CLI, headless CLI, SDK, IDE와 데스크톱이다.</li>
+<li><strong>에이전트 루프</strong>: 모델 호출, 도구 디스패치와 결과 수집을 반복한다.</li>
+<li><strong>권한 시스템</strong>: deny 우선 규칙, 모드, 분류기와 훅을 결합한다.</li>
+<li><strong>도구</strong>: 내장 도구와 MCP 도구를 하나의 실행 표면으로 제공한다.</li>
+<li><strong>상태와 지속성</strong>: JSONL 대화, 프롬프트 기록과 sidechain을 보존한다.</li>
+<li><strong>실행 환경</strong>: 셸, 파일시스템, 웹과 외부 MCP 연결이다.</li>
+</ol>
+<p>중요한 주장은 인터페이스마다 엔진이 따로 있지 않다는 것이다. CLI, SDK와 IDE가
+하나의 <code>queryLoop</code>로 수렴한다. <code>QueryEngine</code>은 대화를 감싸는 객체이지 별도의
+실행 엔진이 아니다.</p>
+<h2 id="다섯-계층"><a class="header" href="#다섯-계층">다섯 계층</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>계층</th><th>책임</th></tr></thead><tbody>
+<tr><td>Surface</td><td>입력, 출력과 제품별 인터페이스</td></tr>
+<tr><td>Core</td><td>컨텍스트 조립, 모델 호출과 에이전트 루프</td></tr>
+<tr><td>Safety/Action</td><td>권한, 도구, 훅과 샌드박스</td></tr>
+<tr><td>State</td><td>런타임 상태, 대화와 메모리 지속성</td></tr>
+<tr><td>Backend</td><td>셸, 네트워크와 MCP 실행 환경</td></tr>
+</tbody></table>
+</div>
+<p>이 계층을 읽을 때 “어떤 이벤트가 화면에 보이는가”와 “실제로 어떤 컴포넌트가
+행동을 소유하는가”를 구분해야 한다. UI는 루프를 보여 주지만 루프의 진실을
+소유하지 않는다. 권한 패널은 결정을 전달하지만 권한 규칙을 재구현하지 않는다.</p>
+<pre><code class="language-mermaid">flowchart TB
+    S["CLI · SDK · IDE · Desktop"] --&gt; C["Core query loop"]
+    C --&gt; A["Safety / Action"]
+    A --&gt; B["Shell · Filesystem · MCP"]
+    C &lt;--&gt; ST["Session · Context · Memory"]
+    C --&gt; S
+</code></pre>
+<h2 id="한-턴의-아홉-단계"><a class="header" href="#한-턴의-아홉-단계">한 턴의 아홉 단계</a></h2>
+<p>원 연구는 한 턴을 다음 순서로 정리한다.</p>
+<p>설정 해석 → 상태 초기화 → 컨텍스트 조립 → pre-model 압축 →
+모델 호출 → 도구 디스패치 → 권한 게이트 → 실행 → 종료 조건</p>
+<p>여기서 스트림은 단일 응답 상자가 아니다. 모델 텍스트, 도구 호출, 권한 대기,
+도구 결과와 다음 모델 호출이 하나의 시간축에서 이어진다.</p>
+<h2 id="실제-source-stream과-terminal을-함께-갖는-경계"><a class="header" href="#실제-source-stream과-terminal을-함께-갖는-경계">실제 source: stream과 terminal을 함께 갖는 경계</a></h2>
+<pre><code class="language-typescript">export async function* query(
+  params: QueryParams,
+): AsyncGenerator&lt;
+  StreamEvent | RequestStartEvent | Message,
+  Terminal
+&gt;
+</code></pre>
+<p>실제 union에는 tombstone과 tool summary도 들어간다. <a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L219-L250"><code>query()</code></a>가
+이벤트를 순서대로 <code>yield</code>하면서 최종 종료 이유를 별도로 <code>return</code>한다는 점이
+계층의 핵심이다. 화면은 stream을 소비하지만 core의 terminal 의미를 새로 만들지
+않는다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/iteration.png" alt="한 턴의 실행 흐름" /></p>
+<h2 id="원문으로-돌아가기-1"><a class="header" href="#원문으로-돌아가기-1">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture Overview</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Architecture at a Glance</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="3장-가치에서-구현까지"><a class="header" href="#3장-가치에서-구현까지">3장: 가치에서 구현까지</a></h1>
+<p>원 연구의 특징은 코드 패턴을 곧바로 모범 답안으로 만들지 않는 데 있다. 먼저
+사람이 지키고 싶은 가치를 놓고, 그 가치가 설계 원칙과 구현으로 어떻게 내려오는지
+추적한다.</p>
+<h2 id="다섯-가치"><a class="header" href="#다섯-가치">다섯 가치</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>가치</th><th>Claude Code에서 보이는 의미</th></tr></thead><tbody>
+<tr><td>인간의 결정 권한</td><td>목표, 승인과 중단의 최종 권한은 사용자에게 있다</td></tr>
+<tr><td>안전·보안·프라이버시</td><td>사용자가 모든 경고를 주의 깊게 읽지 않아도 시스템이 보호한다</td></tr>
+<tr><td>신뢰할 수 있는 실행</td><td>수집하고 행동한 뒤 결과를 다시 검증한다</td></tr>
+<tr><td>능력 증폭</td><td>모델을 과도한 절차로 묶지 않고 강한 하니스로 뒷받침한다</td></tr>
+<tr><td>맥락 적응</td><td>프로젝트 지침과 신뢰 수준이 환경에 따라 달라진다</td></tr>
+</tbody></table>
+</div>
+<h2 id="열세-설계-원칙"><a class="header" href="#열세-설계-원칙">열세 설계 원칙</a></h2>
+<p>원 연구는 다음 원칙을 제시한다.</p>
+<ol>
+<li>deny 우선과 인간에게의 escalation</li>
+<li>단계적으로 높아지는 신뢰</li>
+<li>서로 겹치는 심층 방어</li>
+<li>파일과 훅으로 외부화된 정책</li>
+<li>희소 자원으로서의 컨텍스트</li>
+<li>append-only 지속 상태</li>
+<li>최소 scaffolding과 최대 harness</li>
+<li>고정 절차보다 가치 기반 판단</li>
+<li>비용이 다른 복수의 확장 메커니즘</li>
+<li>되돌릴 수 있는 행동을 더 가볍게 다루는 위험 평가</li>
+<li>사용자가 읽을 수 있는 파일 기반 설정과 메모리</li>
+<li>격리된 서브에이전트 경계</li>
+<li>실패를 전제로 한 복구와 회복력</li>
+</ol>
+<p>이 원칙은 서로 독립된 체크리스트가 아니다. 예를 들어 파일 기반 메모리는
+투명성을 높이지만 검색 능력은 제한한다. 그래서 별도의 LLM relevance scan이
+그 단순한 저장 방식을 보완한다. 한 설계 선택은 다른 선택의 비용을 만든다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    V["가치"] --&gt; P["설계 원칙"]
+    P --&gt; C["코드 계약"]
+    C --&gt; E["실행 evidence"]
+    E --&gt; R{"가치를 지켰나?"}
+    R --&gt; P
+</code></pre>
+<h2 id="실제-source-결정-이유의-provenance"><a class="header" href="#실제-source-결정-이유의-provenance">실제 source: 결정 이유의 provenance</a></h2>
+<pre><code class="language-typescript">export type PermissionDecisionReason =
+  | { type: 'rule'; rule: PermissionRule }
+  | { type: 'mode'; mode: PermissionMode }
+  | { type: 'hook'; hookName: string; reason?: string }
+  | { type: 'classifier'; classifier: string }
+</code></pre>
+<p>실제 union에는 subcommand, prompt tool, async agent와 sandbox 이유도 있다.
+<a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/permissions.ts#L268-L310"><code>PermissionDecisionReason</code></a>은 허용/거부만 남기지 않고 어떤
+경계가 결정했는지를 보존한다. 가치가 구현으로 내려왔는지는 결과 문자열보다
+이 provenance에서 더 정확하게 검증할 수 있다.</p>
+<h2 id="승인-피로가-가르치는-것"><a class="header" href="#승인-피로가-가르치는-것">승인 피로가 가르치는 것</a></h2>
+<p>승인 요청의 93%가 검토 없이 허용됐다면 경고를 더 많이 띄우는 것이 답이 아니다.
+사용자가 반복 판단하지 않아도 되는 안전 구역을 샌드박스와 분류기로 만들고,
+되돌리기 어려운 행동에 집중해서 승인받아야 한다.</p>
+<p>인간 중심 설계는 모든 이벤트를 사람에게 던지는 것이 아니다. 모델과 사람 모두가
+판단에 필요한 원본을 잃지 않되, 사람이 실제로 판단해야 하는 경계가 선명해야 한다.</p>
+<h2 id="원문으로-돌아가기-2"><a class="header" href="#원문으로-돌아가기-2">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Values and Design Principles</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md">Build Your Own Agent: 설계 결정</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="4장-권한과-심층-방어"><a class="header" href="#4장-권한과-심층-방어">4장: 권한과 심층 방어</a></h1>
+<p>Claude Code의 안전 모델은 하나의 승인 창이 아니다. 요청은 적용 가능한 모든
+안전 계층을 통과해야 하며, 한 계층이라도 막으면 실행되지 않는다.</p>
+<h2 id="일곱-안전-계층"><a class="header" href="#일곱-안전-계층">일곱 안전 계층</a></h2>
+<ol>
+<li>금지된 도구를 모델의 도구 목록에서 먼저 제거한다.</li>
+<li>deny 규칙이 allow 규칙보다 항상 우선한다.</li>
+<li>현재 permission mode가 기본 행동을 제한한다.</li>
+<li>auto mode에서는 별도 모델 분류기가 위험을 평가한다.</li>
+<li>셸 실행은 파일시스템과 네트워크 샌드박스를 거친다.</li>
+<li>재개한 세션은 이전 권한을 자동 복원하지 않는다.</li>
+<li><code>PreToolUse</code> 훅이 입력을 수정하거나 실행을 차단할 수 있다.</li>
+</ol>
+<h2 id="단계적-신뢰"><a class="header" href="#단계적-신뢰">단계적 신뢰</a></h2>
+<p><code>plan</code>, <code>default</code>, <code>acceptEdits</code>, <code>auto</code>, <code>dontAsk</code>,
+<code>bypassPermissions</code>는 단순한 편의 옵션이 아니다. 사용자가 작업과 환경을 얼마나
+신뢰하는지 표현하는 스펙트럼이다. 내부 <code>bubble</code> 모드는 서브에이전트의 결정을
+상위 조정자에게 올린다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    U["tool_use"] --&gt; F["tool visibility filter"]
+    F --&gt; H["PreToolUse hook"]
+    H --&gt; R["deny-first rules"]
+    R --&gt; M["permission mode"]
+    M --&gt; Q{"allow · ask · deny"}
+    Q --&gt;|allow| X["sandboxed execution"]
+    Q --&gt;|ask| P["사용자 승인"]
+    Q --&gt;|deny| D["원인과 함께 차단"]
+</code></pre>
+<h2 id="실제-source-질문은-실행이-아니다"><a class="header" href="#실제-source-질문은-실행이-아니다">실제 source: 질문은 실행이 아니다</a></h2>
+<pre><code class="language-typescript">export type PermissionResult&lt;Input&gt; =
+  | PermissionDecision&lt;Input&gt;
+  | {
+      behavior: 'passthrough'
+      message: string
+      pendingClassifierCheck?: PendingClassifierCheck
+    }
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/permissions.ts#L241-L266"><code>PermissionResult</code></a>의 <code>passthrough</code>는 상위 handler가 결정을
+이어받아야 한다는 뜻이다. 이를 allow로 바꾸거나, 승인 UI를 별도 새 세션으로
+투사하면 원래 permission protocol을 깨뜨린다.</p>
+<h2 id="공유-실패-모드"><a class="header" href="#공유-실패-모드">공유 실패 모드</a></h2>
+<p>방어층이 많다고 자동으로 안전해지지는 않는다. 여러 계층이 같은 토큰 비용,
+파서나 이벤트 루프 한계에 의존하면 하나의 제약이 동시에 여러 방어를 약화시킨다.
+원 연구는 긴 복합 명령의 보안 분석이 성능 제약 때문에 우회될 수 있는 사례를
+통해 이 점을 경고한다.</p>
+<h2 id="재개의-의미"><a class="header" href="#재개의-의미">재개의 의미</a></h2>
+<p>대화 내용과 세션 ID를 재사용하는 것과 권한을 재사용하는 것은 다르다. 세션은
+계속되더라도 실행 환경과 사용자 의도는 달라질 수 있다. 그래서 권한을 다시
+확립한다. 지속성과 신뢰를 같은 필드로 묶지 않는 것이 안전 불변식이다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/permission.png" alt="권한 게이트" /></p>
+<h2 id="원문으로-돌아가기-3"><a class="header" href="#원문으로-돌아가기-3">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Seven Independent Safety Layers</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Safety and Permissions</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="5장-컨텍스트는-가장-희소한-자원이다"><a class="header" href="#5장-컨텍스트는-가장-희소한-자원이다">5장: 컨텍스트는 가장 희소한 자원이다</a></h1>
+<p>원 연구는 컨텍스트 창을 Claude Code 아키텍처의 <strong>binding constraint</strong>로 본다.
+도구 지연 로딩, 서브에이전트 요약, 메모리 선택과 결과 크기 제한은 모두 유한한
+컨텍스트를 오래 유지하기 위한 선택이다.</p>
+<h2 id="아홉-개의-입력-층"><a class="header" href="#아홉-개의-입력-층">아홉 개의 입력 층</a></h2>
+<p>시스템 프롬프트, 환경 정보, CLAUDE.md 계층, 경로별 규칙, 자동 메모리, 도구
+메타데이터, 대화 기록, 도구 결과와 compact summary가 순서대로 현재 모델 입력을
+구성한다.</p>
+<p>CLAUDE.md는 중요한 지침이지만 system prompt와 같은 강제 규칙이 아니다. 사용자
+컨텍스트로 전달되어 확률적으로 준수된다. 강제해야 하는 보안 정책은 permission
+rule과 샌드박스가 맡는다.</p>
+<h2 id="다섯-단계-압축"><a class="header" href="#다섯-단계-압축">다섯 단계 압축</a></h2>
+<p>가장 덜 파괴적인 방법부터 순서대로 적용한다.</p>
+<ol>
+<li>메시지별 예산을 줄인다.</li>
+<li>오래된 이력을 잘라 낸다.</li>
+<li>캐시를 고려해 미세 압축한다.</li>
+<li>원본을 지우지 않고 읽을 때 가상 projection을 만든다.</li>
+<li>마지막 수단으로 모델이 전체 요약을 만든다.</li>
+</ol>
+<p>이 설계는 압축 성공을 “원래 대화가 사라졌다”는 뜻으로 만들지 않는다. 원본
+transcript는 append-only로 남고, 현재 모델이 보는 projection만 달라진다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    R["append-only raw transcript"] --&gt; B["budget reduction"]
+    B --&gt; S["snip"]
+    S --&gt; M["microcompact"]
+    M --&gt; C["context collapse"]
+    C --&gt; A["auto-compact summary"]
+    A --&gt; P["현재 model projection"]
+</code></pre>
+<h2 id="실제-source-값싼-압축부터"><a class="header" href="#실제-source-값싼-압축부터">실제 source: 값싼 압축부터</a></h2>
+<pre><code class="language-typescript">const snipResult = await deps.snip(messagesForQuery, querySource)
+messagesForQuery = snipResult.messages
+const microcompactResult = await deps.microcompact(
+  messagesForQuery,
+  querySource,
+)
+messagesForQuery = microcompactResult.messages
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L396-L468"><code>queryLoop()</code> 압축 구간</a>은 snip 뒤 microcompact를 적용하고,
+그 다음 context collapse와 autocompact를 검사한다. 다이어그램의 다섯 단계가
+동시에 실행되는 단일 “압축 상태”가 아니라, 조건과 비용이 다른 순차 projection인
+이유를 코드에서 확인할 수 있다.</p>
+<h2 id="파일-기반-메모리"><a class="header" href="#파일-기반-메모리">파일 기반 메모리</a></h2>
+<p>Claude Code 메모리는 벡터 데이터베이스가 아니라 사람이 열 수 있는 파일이다.
+모델은 파일 헤더를 읽고 관련성이 높은 항목을 선택한다. 검색 성능보다 다음
+가치를 우선한다.</p>
+<ul>
+<li>사용자가 무엇을 기억하는지 직접 확인한다.</li>
+<li>편집하고 삭제할 수 있다.</li>
+<li>버전 관리할 수 있다.</li>
+<li>에이전트의 자기 보고에 의존하지 않는다.</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/context.png" alt="컨텍스트 조립" /></p>
+<h2 id="원문으로-돌아가기-4"><a class="header" href="#원문으로-돌아가기-4">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Context Construction and Memory</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md">Build Your Own Agent: How Do You Manage Context?</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="6장-네-가지-확장-메커니즘"><a class="header" href="#6장-네-가지-확장-메커니즘">6장: 네 가지 확장 메커니즘</a></h1>
+<p>원 연구는 확장을 하나의 플러그인 API로 통합하지 않는다. 확장이 모델
+컨텍스트와 실행 환경에 미치는 비용이 서로 다르기 때문이다.</p>
+<div class="table-wrapper"><table><thead><tr><th>메커니즘</th><th style="text-align: right">컨텍스트 비용</th><th>역할</th></tr></thead><tbody>
+<tr><td>Hooks</td><td style="text-align: right">0</td><td>수명 주기 관찰, 차단과 외부 자동화</td></tr>
+<tr><td>Skills</td><td style="text-align: right">낮음</td><td>필요할 때 현재 컨텍스트에 절차를 주입</td></tr>
+<tr><td>Plugins</td><td style="text-align: right">중간</td><td>명령, 에이전트, 스킬, 훅, MCP와 설정을 패키징</td></tr>
+<tr><td>MCP</td><td style="text-align: right">높음</td><td>외부 도구와 리소스를 새로운 실행 표면으로 제공</td></tr>
+</tbody></table>
+</div>
+<h2 id="세-개의-주입-지점"><a class="header" href="#세-개의-주입-지점">세 개의 주입 지점</a></h2>
+<ol>
+<li><strong>assemble()</strong>: 모델이 무엇을 보는가</li>
+<li><strong>model()</strong>: 모델이 어떤 도구에 접근할 수 있는가</li>
+<li><strong>execute()</strong>: 호출이 실제로 허용되고 어떻게 실행되는가</li>
+</ol>
+<p>도구 설명과 스킬은 모델의 다음 행동을 유도하지만 실행 결과를 대신하지 않는다.
+권한 훅은 실행을 차단할 수 있지만 모델에게 거짓 성공을 반환해서는 안 된다.
+MCP는 도구를 제공하지만 그것을 언제 쓸지는 모델과 현재 목표가 판단한다.</p>
+<h2 id="도구-풀-조립"><a class="header" href="#도구-풀-조립">도구 풀 조립</a></h2>
+<p>기본 도구 열거 → 실행 모드 필터 → deny 규칙 필터 → MCP 통합 → 중복 제거의
+순서로 모델에게 보일 도구가 결정된다. “코드에 도구가 존재한다”와 “현재 세션의
+모델이 그 도구를 볼 수 있다”는 다른 사실이다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    H["Hooks\n0 context"] --&gt; E["execute boundary"]
+    S["Skills\non-demand context"] --&gt; A["assemble"]
+    P["Plugins\npackaging"] --&gt; A
+    P --&gt; M["model tool surface"]
+    MCP["MCP\nexternal tools"] --&gt; M
+    M --&gt; E
+</code></pre>
+<h2 id="실제-source-self-describing-tool-contract"><a class="header" href="#실제-source-self-describing-tool-contract">실제 source: self-describing tool contract</a></h2>
+<pre><code class="language-typescript">type DefaultableToolKeys =
+  | 'isEnabled'
+  | 'isConcurrencySafe'
+  | 'isReadOnly'
+  | 'isDestructive'
+  | 'checkPermissions'
+  | 'userFacingName'
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/Tool.ts#L704-L726"><code>ToolDef</code></a>은 각 tool이 실행 함수만이 아니라 활성화 조건, 동시성,
+파괴성, permission과 표시 이름을 함께 선언하게 한다. <code>buildTool()</code>은 빠진
+기본값을 채우지만, 실제 실행 결과나 위험도를 host가 임의로 재해석하지 않는다.</p>
+<h2 id="skilltool과-agenttool"><a class="header" href="#skilltool과-agenttool">SkillTool과 AgentTool</a></h2>
+<p>SkillTool은 현재 컨텍스트에 지침을 넣는다. AgentTool은 별도 컨텍스트를 가진
+실행자를 만든다. 같은 Markdown을 읽는 것처럼 보여도 비용과 격리 경계가 전혀
+다르다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/extensibility.png" alt="확장 주입 지점" /></p>
+<h2 id="원문으로-돌아가기-5"><a class="header" href="#원문으로-돌아가기-5">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Extensibility</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Extensibility</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="7장-서브에이전트와-격리"><a class="header" href="#7장-서브에이전트와-격리">7장: 서브에이전트와 격리</a></h1>
+<p>서브에이전트는 같은 대화에 역할 이름을 하나 더 붙이는 기능이 아니다. 새
+컨텍스트, 도구 집합, permission mode와 transcript를 가진 격리된 실행이다.</p>
+<h2 id="격리의-이유"><a class="header" href="#격리의-이유">격리의 이유</a></h2>
+<p>하위 실행의 모든 대화를 부모에게 복사하면 부모 컨텍스트가 빠르게 소진된다.
+Claude Code는 서브에이전트의 전체 기록을 sidechain JSONL에 보존하고, 부모에게는
+요약만 돌려준다. 자세한 원본은 사라지지 않지만 부모의 현재 작업창에는 들어오지
+않는다.</p>
+<h2 id="세-가지-실행-경계"><a class="header" href="#세-가지-실행-경계">세 가지 실행 경계</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>방식</th><th>격리</th></tr></thead><tbody>
+<tr><td>in-process</td><td>대화 컨텍스트는 분리하지만 파일시스템은 공유</td></tr>
+<tr><td>worktree</td><td>대화와 쓰기 작업공간을 함께 분리</td></tr>
+<tr><td>remote</td><td>실행 환경까지 원격으로 분리</td></tr>
+</tbody></table>
+</div>
+<p>격리는 강할수록 비용이 커진다. 모든 작은 작업을 서브에이전트로 보내는 것은
+정답이 아니다. 독립적인 조사, 검증이나 장시간 작업처럼 경계가 실제 이익을 줄 때
+사용해야 한다.</p>
+<h2 id="권한의-상속과-escalation"><a class="header" href="#권한의-상속과-escalation">권한의 상속과 escalation</a></h2>
+<p>하위 실행은 자신의 permission mode를 가질 수 있지만, 사용자가 부모 세션에서
+명시적으로 선택한 강한 모드가 우선될 수 있다. 반대로 하위 실행이 사용자에게
+직접 질문하지 못하는 환경에서는 상위 조정자에게 권한 요청과 질문을 올려야 한다.</p>
+<p>이때 중요한 것은 조정자가 결과를 대신 만들어 주는 것이 아니다. 하위 실행의
+요청을 원문 의미를 잃지 않고 부모와 사용자에게 전달하는 것이다.</p>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant P as Primary agent
+    participant A as AgentTool
+    participant C as Child context
+    P-&gt;&gt;A: 독립 task 위임
+    A-&gt;&gt;A: tool·MCP·permission 필터
+    A-&gt;&gt;C: 새 context에서 실행
+    C--&gt;&gt;A: result + sidechain evidence
+    A--&gt;&gt;P: 요약된 결과
+</code></pre>
+<h2 id="실제-source-spawn-전에-도구-가시성-계산"><a class="header" href="#실제-source-spawn-전에-도구-가시성-계산">실제 source: spawn 전에 도구 가시성 계산</a></h2>
+<pre><code class="language-typescript">const agentsWithMcpRequirementsMet =
+  filterAgentsByMcpRequirements(agents, mcpServersWithTools)
+const filteredAgents = filterDeniedAgents(
+  agentsWithMcpRequirementsMet,
+  toolPermissionContext,
+  AGENT_TOOL_NAME,
+)
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/tools/AgentTool/AgentTool.tsx#L196-L230"><code>AgentTool</code></a>은 agent를 spawn하기 전에 MCP 요구사항과 현재
+permission rule을 적용한다. 자식에게 모든 도구를 넘긴 뒤 UI에서 숨기는 방식이
+아니다. 모델에게 보이는 capability 자체가 실행 경계와 일치해야 한다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/subagent.png" alt="서브에이전트 구조" /></p>
+<h2 id="원문으로-돌아가기-6"><a class="header" href="#원문으로-돌아가기-6">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Subagent Delegation</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Subagent Delegation</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="8장-세션-메모리와-재개"><a class="header" href="#8장-세션-메모리와-재개">8장: 세션, 메모리와 재개</a></h1>
+<p>Claude Code의 지속성은 하나의 데이터베이스 행이 아니다. 서로 다른 목적을 가진
+세 채널이 있다.</p>
+<div class="table-wrapper"><table><thead><tr><th>채널</th><th>역할</th></tr></thead><tbody>
+<tr><td>session transcript</td><td>한 세션의 전체 메시지와 compact 경계</td></tr>
+<tr><td>global prompt history</td><td>세션을 넘나드는 사용자 프롬프트 탐색</td></tr>
+<tr><td>subagent sidechain</td><td>하위 실행의 격리된 전체 기록</td></tr>
+</tbody></table>
+</div>
+<h2 id="append-only를-선택한-이유"><a class="header" href="#append-only를-선택한-이유">Append-only를 선택한 이유</a></h2>
+<p>JSONL은 복잡한 질의에는 불리하다. 대신 한 이벤트씩 추가되고 기존 원본을
+파괴하지 않으므로 감사와 복원이 쉽다. compact 전후 연결도 원본을 다시 쓰지 않고
+읽는 시점에 chain을 patch한다.</p>
+<h2 id="세션-재사용의-계약"><a class="header" href="#세션-재사용의-계약">세션 재사용의 계약</a></h2>
+<p>재개는 같은 session ID와 대화 이력을 이어 쓰는 것이다. 매 사용자 메시지마다
+새 세션을 만드는 것은 재개가 아니다. 반대로 같은 세션을 쓴다고 모든 run과 turn을
+하나로 합쳐서는 안 된다.</p>
+<ul>
+<li>session: 지속되는 대화와 원격 실행의 식별자</li>
+<li>turn: 하나의 사용자 입력과 그에 대한 실행</li>
+<li>run: 제품이 묶어 보여 주는 장기 작업 범위</li>
+</ul>
+<p>턴 종료 신호를 세션 종료로 해석하면 멀티턴 대화가 깨진다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    S["session ID"] --&gt; T1["turn 1"]
+    S --&gt; T2["turn 2"]
+    S --&gt; T3["turn 3"]
+    T1 --&gt; J["append-only transcript"]
+    T2 --&gt; J
+    T3 --&gt; J
+    J --&gt; R["resume same session"]
+</code></pre>
+<h2 id="실제-source-session-id와-경로를-함께-전환"><a class="header" href="#실제-source-session-id와-경로를-함께-전환">실제 source: session ID와 경로를 함께 전환</a></h2>
+<pre><code class="language-typescript">export function switchSession(
+  sessionId: SessionId,
+  projectDir: string | null = null,
+): void {
+  STATE.sessionId = sessionId
+  STATE.sessionProjectDir = projectDir
+  sessionSwitched.emit(sessionId)
+}
+</code></pre>
+<p>실제 함수는 이전 session의 plan-slug cache도 먼저 정리한다.
+<a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/bootstrap/state.ts#L456-L481"><code>switchSession()</code></a>이 ID와 transcript directory를 원자적으로
+바꾸는 이유는 다른 project나 worktree의 session을 재개할 때 둘이 어긋나지
+않게 하기 위해서다. 입력마다 <code>regenerateSessionId()</code>를 호출하면 이 계약을
+사용하지 않은 것이다.</p>
+<h2 id="권한은-복원하지-않는다"><a class="header" href="#권한은-복원하지-않는다">권한은 복원하지 않는다</a></h2>
+<p>대화는 재개하지만 권한은 현재 환경에서 다시 확인한다. 이전 세션의 trust를
+조용히 되살리지 않는 것이 안전 경계다.</p>
+<p><img src="https://raw.githubusercontent.com/VILA-Lab/Dive-into-Claude-Code/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/assets/session_compact.png" alt="세션과 압축" /></p>
+<h2 id="원문으로-돌아가기-7"><a class="header" href="#원문으로-돌아가기-7">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Session Persistence</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/architecture.md">Architecture: Session Persistence</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="9장-나만의-에이전트를-설계하는-질문"><a class="header" href="#9장-나만의-에이전트를-설계하는-질문">9장: 나만의 에이전트를 설계하는 질문</a></h1>
+<p>원본의 <code>Build Your Own AI Agent</code>는 코딩 튜토리얼이 아니다. Claude Code의 답을
+복제하기 전에 자신의 제품이 어떤 설계 공간에 있는지 묻는 안내서다.</p>
+<h2 id="판단은-어디에-둘-것인가"><a class="header" href="#판단은-어디에-둘-것인가">판단은 어디에 둘 것인가</a></h2>
+<ul>
+<li>모델에 넓은 판단권을 주고 하니스가 경계를 강제할 것인가?</li>
+<li>명시적 상태 그래프로 흐름을 고정할 것인가?</li>
+<li>장기 계획기와 task tracker를 둘 것인가?</li>
+</ul>
+<p>규제된 반복 업무에는 상태 그래프가 유리할 수 있다. 빠르게 발전하는 범용 모델에
+과도한 scaffolding을 쌓으면 모델이 좋아질수록 그것이 기술 부채가 될 수 있다.</p>
+<h2 id="안전-경계는-무엇인가"><a class="header" href="#안전-경계는-무엇인가">안전 경계는 무엇인가</a></h2>
+<p>승인 창, 컨테이너, git rollback과 심층 방어는 서로 보호하는 범위가 다르다.
+파일을 되돌릴 수 있다고 네트워크 전송이나 외부 서비스 변경까지 되돌릴 수 있는
+것은 아니다.</p>
+<h2 id="컨텍스트를-어떻게-유지할-것인가"><a class="header" href="#컨텍스트를-어떻게-유지할-것인가">컨텍스트를 어떻게 유지할 것인가</a></h2>
+<p>단순 자르기, sliding window, RAG, 단일 요약과 단계적 compaction 중 무엇을
+선택할지 결정해야 한다. 몇 시간짜리 작업을 지원한다면 초기부터 압축과 원본
+보존을 함께 설계해야 한다.</p>
+<h2 id="확장을-어떤-비용으로-제공할-것인가"><a class="header" href="#확장을-어떤-비용으로-제공할-것인가">확장을 어떤 비용으로 제공할 것인가</a></h2>
+<p>모든 확장을 full tool schema로 넣으면 컨텍스트가 무너진다. 관찰만 필요한 것은
+hook, 필요할 때만 읽을 절차는 skill, 외부 행동은 MCP처럼 비용과 책임을
+분리한다.</p>
+<h2 id="서브에이전트와-세션"><a class="header" href="#서브에이전트와-세션">서브에이전트와 세션</a></h2>
+<p>하위 실행이 문맥을 공유할지, 요약만 돌려줄지, 메시지 프로토콜을 쓸지 정해야
+한다. 세션 저장도 stateless, DB, append-only 파일 사이에서 감사 가능성과 질의
+능력을 선택해야 한다.</p>
+<h2 id="반복되는-세-약속"><a class="header" href="#반복되는-세-약속">반복되는 세 약속</a></h2>
+<p>원 연구는 Claude Code의 여러 설계에서 세 약속을 발견한다.</p>
+<ol>
+<li>하나의 거대한 메커니즘보다 단계적 계층</li>
+<li>질의 편의보다 원본 감사 가능성을 택한 append-only</li>
+<li>결정론적 하니스 안에서 사용하는 모델 판단</li>
+</ol>
+<pre><code class="language-mermaid">flowchart TB
+    G["Goal"] --&gt; Q["Query contract"]
+    Q --&gt; C["Context budget"]
+    Q --&gt; T["Tool capabilities"]
+    Q --&gt; P["Permission policy"]
+    Q --&gt; X["Stop·recovery limits"]
+    C --&gt; V["관측 가능한 결과"]
+    T --&gt; V
+    P --&gt; V
+    X --&gt; V
+</code></pre>
+<h2 id="실제-source-loop에-들어가기-전의-계약"><a class="header" href="#실제-source-loop에-들어가기-전의-계약">실제 source: loop에 들어가기 전의 계약</a></h2>
+<pre><code class="language-typescript">export type QueryParams = {
+  messages: Message[]
+  systemPrompt: SystemPrompt
+  canUseTool: CanUseToolFn
+  toolUseContext: ToolUseContext
+  maxTurns?: number
+  taskBudget?: { total: number }
+}
+</code></pre>
+<p>실제 타입에는 user/system context, fallback model과 cache 설정도 있다.
+<a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/query.ts#L181-L217"><code>QueryParams</code></a>는 model 선택 하나가 agent 설계가 아님을
+보여 준다. 목표를 실행 가능한 시스템으로 만들려면 context, capability,
+permission, turn과 budget 경계를 함께 명시해야 한다.</p>
+<h2 id="설계-워크시트"><a class="header" href="#설계-워크시트">설계 워크시트</a></h2>
+<p>새 agent를 만들기 전에 위 그래프의 각 화살표에 대해 “누가 소유하는가”,
+“무슨 실제 event로 검증하는가”, “실패하면 무엇을 반환하는가”를 한 문장씩
+작성한다. 답이 없는 부분은 prompt로 덮지 말고 아직 구현되지 않은 경계로 남긴다.</p>
+<h2 id="원문으로-돌아가기-8"><a class="header" href="#원문으로-돌아가기-8">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md">Build Your Own AI Agent: 전문</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="10장-연구의-한계와-후속-자료"><a class="header" href="#10장-연구의-한계와-후속-자료">10장: 연구의 한계와 후속 자료</a></h1>
+<p>이 연구는 Claude Code의 특정 버전과 당시 확인 가능한 소스, 커뮤니티 분석을
+기준으로 한다. 기능 이름, 도구 수, permission mode와 내부 경로는 이후 버전에서
+달라질 수 있다.</p>
+<h2 id="세-등급으로-읽기"><a class="header" href="#세-등급으로-읽기">세 등급으로 읽기</a></h2>
+<ol>
+<li><strong>원본에서 직접 확인한 구조</strong>: 고정 commit의 코드와 문서가 지지한다.</li>
+<li><strong>연구자의 해석</strong>: 구조에서 가치와 설계 원칙을 도출한다.</li>
+<li><strong>다른 시스템으로의 제안</strong>: 에이전트 구축자가 선택할 설계 공간이다.</li>
+</ol>
+<p>세 등급을 한 문장에서 “Claude Code가 공식적으로 이렇게 설계됐다”고 합치지
+않는다. 역공학 연구는 구현을 관찰할 수 있지만 Anthropic의 원래 의사결정 과정
+전체를 증명하지는 않는다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    S["고정 source snapshot"] --&gt; F["직접 확인한 사실"]
+    F --&gt; I["연구자의 해석"]
+    I --&gt; P["다른 시스템에 대한 제안"]
+    E["공식 SDK raw evidence"] --&gt; X{"교차 검증"}
+    F --&gt; X
+    X --&gt; C["일치·차이·미관측을 구분"]
+</code></pre>
+<h2 id="실제-source가-말할-수-있는-범위"><a class="header" href="#실제-source가-말할-수-있는-범위">실제 source가 말할 수 있는 범위</a></h2>
+<pre><code class="language-typescript">export type TranscriptMessage = SerializedMessage &amp; {
+  parentUuid: UUID | null
+  isSidechain: boolean
+  agentId?: string
+  teamName?: string
+  promptId?: string
+}
+</code></pre>
+<p><a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/logs.ts#L221-L231"><code>TranscriptMessage</code></a>는 source snapshot에서 parent,
+sidechain, agent/team과 OTel prompt correlation이 저장된다는 사실을
+지지한다. 그러나 이것만으로 특정 팀이 실제 실행됐거나 공식 SDK가 같은 필드를
+보장한다고 말할 수는 없다. 실제 session evidence와 공식 문서를 별도로 확인해야
+한다.</p>
+<h2 id="함께-볼-자료"><a class="header" href="#함께-볼-자료">함께 볼 자료</a></h2>
+<ul>
+<li>원 논문과 PDF</li>
+<li>원 저장소의 architecture deep dive</li>
+<li>agent builder design guide</li>
+<li>관련 프로젝트와 연구 목록</li>
+<li>다른 에이전트 시스템과의 비교</li>
+</ul>
+<p>한국어판의 목적은 원문을 대신하는 것이 아니라 학생이 원문을 더 정확하게 읽을
+수 있게 하는 것이다. 수치와 세부 기능을 인용할 때는 항상 고정 원문을 다시
+확인한다.</p>
+<h2 id="원문으로-돌아가기-9"><a class="header" href="#원문으로-돌아가기-9">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code">Dive into Claude Code 원 저장소</a></li>
+<li><a href="https://arxiv.org/abs/2604.14228">arXiv 논문</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/related-resources.md">관련 자료 모음</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="출처저작자라이선스"><a class="header" href="#출처저작자라이선스">출처·저작자·라이선스</a></h1>
+<h2 id="원저작물"><a class="header" href="#원저작물">원저작물</a></h2>
+<ul>
+<li>제목: <code>Dive into Claude Code</code></li>
+<li>저자·연구 그룹: VILA Lab 및 원 저장소 기여자</li>
+<li>원 저장소: <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code">https://github.com/VILA-Lab/Dive-into-Claude-Code</a></li>
+<li>한국어판 기준 commit:
+<code>ab04bc85e4920ceef2a8a47c069524d3bc9fec22</code></li>
+<li>논문: <a href="https://arxiv.org/abs/2604.14228">https://arxiv.org/abs/2604.14228</a></li>
+</ul>
+<h2 id="한국어판"><a class="header" href="#한국어판">한국어판</a></h2>
+<p>이 한국어판은 원 연구의 구조와 주장을 한국어로 학습하기 위한 비영리 동반판이다.
+원저자의 공로를 유지하며, 원문과 다른 해석이나 오류가 있다면 한국어판의
+책임이다.</p>
+<h2 id="라이선스"><a class="header" href="#라이선스">라이선스</a></h2>
+<p>원저작물은
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International</a>
+조건으로 제공된다. 이 한국어판도 같은 조건으로 제공한다.</p>
+<ul>
+<li>저작자를 표시한다.</li>
+<li>영리 목적으로 판매하지 않는다.</li>
+<li>변경·번역 사실을 밝힌다.</li>
+<li>파생물을 같은 조건으로 공유한다.</li>
+</ul>
+<p>Claude Code와 Anthropic은 Anthropic, PBC의 상표 또는 제품이다. 이 한국어판은
+Anthropic의 공식 문서가 아니며 Anthropic의 승인이나 보증을 받지 않았다.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid-init.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>

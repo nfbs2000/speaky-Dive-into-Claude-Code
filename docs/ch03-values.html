@@ -1,0 +1,297 @@
+<!DOCTYPE HTML>
+<html lang="ko" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>3장: 가치에서 구현까지 - Dive into Claude Code 한국어판</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Claude Code를 프로덕션 AI 에이전트의 설계 공간으로 읽는 연구 기반 한국어판">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="mermaid.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "ayu";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Dive into Claude Code 한국어판</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/nfbs2000/speaky-Dive-into-Claude-Code" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="3장-가치에서-구현까지"><a class="header" href="#3장-가치에서-구현까지">3장: 가치에서 구현까지</a></h1>
+<p>원 연구의 특징은 코드 패턴을 곧바로 모범 답안으로 만들지 않는 데 있다. 먼저
+사람이 지키고 싶은 가치를 놓고, 그 가치가 설계 원칙과 구현으로 어떻게 내려오는지
+추적한다.</p>
+<h2 id="다섯-가치"><a class="header" href="#다섯-가치">다섯 가치</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>가치</th><th>Claude Code에서 보이는 의미</th></tr></thead><tbody>
+<tr><td>인간의 결정 권한</td><td>목표, 승인과 중단의 최종 권한은 사용자에게 있다</td></tr>
+<tr><td>안전·보안·프라이버시</td><td>사용자가 모든 경고를 주의 깊게 읽지 않아도 시스템이 보호한다</td></tr>
+<tr><td>신뢰할 수 있는 실행</td><td>수집하고 행동한 뒤 결과를 다시 검증한다</td></tr>
+<tr><td>능력 증폭</td><td>모델을 과도한 절차로 묶지 않고 강한 하니스로 뒷받침한다</td></tr>
+<tr><td>맥락 적응</td><td>프로젝트 지침과 신뢰 수준이 환경에 따라 달라진다</td></tr>
+</tbody></table>
+</div>
+<h2 id="열세-설계-원칙"><a class="header" href="#열세-설계-원칙">열세 설계 원칙</a></h2>
+<p>원 연구는 다음 원칙을 제시한다.</p>
+<ol>
+<li>deny 우선과 인간에게의 escalation</li>
+<li>단계적으로 높아지는 신뢰</li>
+<li>서로 겹치는 심층 방어</li>
+<li>파일과 훅으로 외부화된 정책</li>
+<li>희소 자원으로서의 컨텍스트</li>
+<li>append-only 지속 상태</li>
+<li>최소 scaffolding과 최대 harness</li>
+<li>고정 절차보다 가치 기반 판단</li>
+<li>비용이 다른 복수의 확장 메커니즘</li>
+<li>되돌릴 수 있는 행동을 더 가볍게 다루는 위험 평가</li>
+<li>사용자가 읽을 수 있는 파일 기반 설정과 메모리</li>
+<li>격리된 서브에이전트 경계</li>
+<li>실패를 전제로 한 복구와 회복력</li>
+</ol>
+<p>이 원칙은 서로 독립된 체크리스트가 아니다. 예를 들어 파일 기반 메모리는
+투명성을 높이지만 검색 능력은 제한한다. 그래서 별도의 LLM relevance scan이
+그 단순한 저장 방식을 보완한다. 한 설계 선택은 다른 선택의 비용을 만든다.</p>
+<pre><code class="language-mermaid">flowchart LR
+    V["가치"] --&gt; P["설계 원칙"]
+    P --&gt; C["코드 계약"]
+    C --&gt; E["실행 evidence"]
+    E --&gt; R{"가치를 지켰나?"}
+    R --&gt; P
+</code></pre>
+<h2 id="실제-source-결정-이유의-provenance"><a class="header" href="#실제-source-결정-이유의-provenance">실제 source: 결정 이유의 provenance</a></h2>
+<pre><code class="language-typescript">export type PermissionDecisionReason =
+  | { type: 'rule'; rule: PermissionRule }
+  | { type: 'mode'; mode: PermissionMode }
+  | { type: 'hook'; hookName: string; reason?: string }
+  | { type: 'classifier'; classifier: string }
+</code></pre>
+<p>실제 union에는 subcommand, prompt tool, async agent와 sandbox 이유도 있다.
+<a href="https://github.com/codeaashu/claude-code/blob/6a2590911df240ff5ea56aa355696cfb94d128cb/src/types/permissions.ts#L268-L310"><code>PermissionDecisionReason</code></a>은 허용/거부만 남기지 않고 어떤
+경계가 결정했는지를 보존한다. 가치가 구현으로 내려왔는지는 결과 문자열보다
+이 provenance에서 더 정확하게 검증할 수 있다.</p>
+<h2 id="승인-피로가-가르치는-것"><a class="header" href="#승인-피로가-가르치는-것">승인 피로가 가르치는 것</a></h2>
+<p>승인 요청의 93%가 검토 없이 허용됐다면 경고를 더 많이 띄우는 것이 답이 아니다.
+사용자가 반복 판단하지 않아도 되는 안전 구역을 샌드박스와 분류기로 만들고,
+되돌리기 어려운 행동에 집중해서 승인받아야 한다.</p>
+<p>인간 중심 설계는 모든 이벤트를 사람에게 던지는 것이 아니다. 모델과 사람 모두가
+판단에 필요한 원본을 잃지 않되, 사람이 실제로 판단해야 하는 경계가 선명해야 한다.</p>
+<h2 id="원문으로-돌아가기"><a class="header" href="#원문으로-돌아가기">원문으로 돌아가기</a></h2>
+<ul>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/README.md">README: Values and Design Principles</a></li>
+<li><a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/blob/ab04bc85e4920ceef2a8a47c069524d3bc9fec22/docs/build-your-own-agent.md">Build Your Own Agent: 설계 결정</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="ch02-architecture.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="ch04-safety.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="ch02-architecture.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="ch04-safety.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid-init.js"></script>
+
+
+
+    </div>
+    </body>
+</html>
